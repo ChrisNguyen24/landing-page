@@ -1126,7 +1126,7 @@
       <div class="contact-form">
         <h4>Đặt lịch hẹn thợ</h4>
         <div id="form-success" style="display:none;background:#e6f9ee;border:1px solid #18a34a;border-radius:8px;padding:16px;color:#14673a;font-weight:600;margin-bottom:16px;">
-          ✅ Đã nhận yêu cầu! Chúng tôi sẽ gọi lại cho bạn trong vài phút.
+          ✅ Zalo đã mở! Tin nhắn đã được sao chép — chỉ cần dán (Ctrl+V) và gửi cho chúng tôi.
         </div>
         <div id="form-error" style="display:none;background:#fff0f0;border:1px solid #e03e3e;border-radius:8px;padding:16px;color:#c0392b;font-weight:600;margin-bottom:16px;">
           ❌ Gửi thất bại. Vui lòng thử lại hoặc gọi trực tiếp: 0977.380.689
@@ -1190,8 +1190,7 @@
 </footer>
 
 <script>
-  // TODO: Replace with your Google Apps Script web app URL after deployment
-  var SHEET_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
+  var ZALO_PHONE = '0977380689';
 
   function submitForm(e) {
     e.preventDefault();
@@ -1205,30 +1204,23 @@
       return;
     }
 
-    var btn = document.getElementById('btn-submit');
-    btn.disabled = true;
-    btn.textContent = 'Đang gửi...';
+    // Build the message text to send on Zalo
+    var msg = 'Xin chào! Tôi muốn đặt lịch thợ:\n'
+      + '- Họ tên: ' + name + '\n'
+      + '- SĐT: ' + phone + '\n'
+      + (address ? '- Địa chỉ: ' + address + '\n' : '')
+      + (message ? '- Sự cố: ' + message : '');
 
-    fetch(SHEET_URL, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name, phone: phone, address: address, message: message })
-    })
-    .then(function() {
-      document.getElementById('form-success').style.display = 'block';
-      document.getElementById('form-error').style.display = 'none';
-      document.getElementById('f-name').value = '';
-      document.getElementById('f-phone').value = '';
-      document.getElementById('f-address').value = '';
-      document.getElementById('f-message').value = '';
-      btn.disabled = false;
-      btn.textContent = '📩 Gửi yêu cầu đặt lịch';
-    })
-    .catch(function() {
-      document.getElementById('form-error').style.display = 'block';
-      btn.disabled = false;
-      btn.textContent = '📩 Gửi yêu cầu đặt lịch';
+    // Copy to clipboard, then open Zalo
+    navigator.clipboard.writeText(msg).catch(function() {});
+    window.open('https://zalo.me/' + ZALO_PHONE, '_blank');
+
+    // Show success UI
+    document.getElementById('form-success').style.display = 'block';
+    document.getElementById('form-error').style.display = 'none';
+    // Clear form
+    ['f-name','f-phone','f-address','f-message'].forEach(function(id){
+      document.getElementById(id).value = '';
     });
   }
 </script>
