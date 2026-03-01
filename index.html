@@ -1125,23 +1125,29 @@
       </div>
       <div class="contact-form">
         <h4>Đặt lịch hẹn thợ</h4>
+        <div id="form-success" style="display:none;background:#e6f9ee;border:1px solid #18a34a;border-radius:8px;padding:16px;color:#14673a;font-weight:600;margin-bottom:16px;">
+          ✅ Đã nhận yêu cầu! Chúng tôi sẽ gọi lại cho bạn trong vài phút.
+        </div>
+        <div id="form-error" style="display:none;background:#fff0f0;border:1px solid #e03e3e;border-radius:8px;padding:16px;color:#c0392b;font-weight:600;margin-bottom:16px;">
+          ❌ Gửi thất bại. Vui lòng thử lại hoặc gọi trực tiếp: 0977.380.689
+        </div>
         <div class="form-group">
           <label>Họ và tên *</label>
-          <input type="text" placeholder="Nhập họ và tên..." />
+          <input id="f-name" type="text" placeholder="Nhập họ và tên..." />
         </div>
         <div class="form-group">
           <label>Số điện thoại *</label>
-          <input type="tel" placeholder="09xx.xxx.xxx" />
+          <input id="f-phone" type="tel" placeholder="09xx.xxx.xxx" />
         </div>
         <div class="form-group">
           <label>Địa chỉ cụ thể</label>
-          <input type="text" placeholder="Số nhà, đường, xã/phường..." />
+          <input id="f-address" type="text" placeholder="Số nhà, đường, xã/phường..." />
         </div>
         <div class="form-group">
           <label>Mô tả sự cố</label>
-          <textarea placeholder="Mô tả ngắn gọn sự cố bạn đang gặp..."></textarea>
+          <textarea id="f-message" placeholder="Mô tả ngắn gọn sự cố bạn đang gặp..."></textarea>
         </div>
-        <button class="btn-submit" onclick="alert('Đã nhận yêu cầu! Chúng tôi sẽ liên hệ bạn trong vài phút!')">📩 Gửi yêu cầu đặt lịch</button>
+        <button class="btn-submit" id="btn-submit" onclick="submitForm(event)">📩 Gửi yêu cầu đặt lịch</button>
       </div>
     </div>
   </div>
@@ -1182,6 +1188,50 @@
     <p>Phục vụ 24/7 toàn huyện Đông Anh, Hà Nội</p>
   </div>
 </footer>
+
+<script>
+  // TODO: Replace with your Google Apps Script web app URL after deployment
+  var SHEET_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
+
+  function submitForm(e) {
+    e.preventDefault();
+    var name    = document.getElementById('f-name').value.trim();
+    var phone   = document.getElementById('f-phone').value.trim();
+    var address = document.getElementById('f-address').value.trim();
+    var message = document.getElementById('f-message').value.trim();
+
+    if (!name || !phone) {
+      alert('Vui lòng nhập họ tên và số điện thoại.');
+      return;
+    }
+
+    var btn = document.getElementById('btn-submit');
+    btn.disabled = true;
+    btn.textContent = 'Đang gửi...';
+
+    fetch(SHEET_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name, phone: phone, address: address, message: message })
+    })
+    .then(function() {
+      document.getElementById('form-success').style.display = 'block';
+      document.getElementById('form-error').style.display = 'none';
+      document.getElementById('f-name').value = '';
+      document.getElementById('f-phone').value = '';
+      document.getElementById('f-address').value = '';
+      document.getElementById('f-message').value = '';
+      btn.disabled = false;
+      btn.textContent = '📩 Gửi yêu cầu đặt lịch';
+    })
+    .catch(function() {
+      document.getElementById('form-error').style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = '📩 Gửi yêu cầu đặt lịch';
+    });
+  }
+</script>
 
 <!-- ===== FLOATING BUTTONS ===== -->
 <div class="floating-phone">
